@@ -8,7 +8,7 @@
 ##############################################################################
 
 syntax "Perl6" "\.p[lm]?6$"
-header "^use v6(.[c|d])?;$"
+header "(^use v6(.[c|d])?;$)|(^#!.*perl6)"
 
 # Default
 color brightwhite "^.+$"
