@@ -75,8 +75,8 @@ color brightred "[$@%&](\?|\*)([A-Z])([A-Z]|-)*([A-Z])"
 
 # Comments
 color brightblue "#.*"
-color brightblue start="#`(" end=")"
-color brightblue start="#`[" end="]"
+color brightblue start="#`\(" end=")"
+color brightblue start="#`\[" end="]"
 
 # Single quoted strings
 color brightgreen "'([^'])*'"
