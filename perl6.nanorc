@@ -74,7 +74,7 @@ color brightred "[$@%&](\.|!|^)?([[:alpha:]]|_)([[:alnum:]]|-|_)*([[:alnum:]]|_)
 color brightred "[$@%&](\?|\*)([A-Z])([A-Z]|-)*([A-Z])"
 
 # Comments
-color brightblue "#.*"
+color brightblue "#[^`]*"
 color brightblue start="#`\(" end=")"
 color brightblue start="#`\[" end="]"
 
