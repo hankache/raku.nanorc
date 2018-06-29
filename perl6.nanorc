@@ -73,13 +73,22 @@ color brightred "[$@%&](\.|!|\^)?([[:alpha:]]|_)"
 color brightred "[$@%&](\.|!|^)?([[:alpha:]]|_)([[:alnum:]]|-|_)*([[:alnum:]]|_)"
 color brightred "[$@%&](\?|\*)([A-Z])([A-Z]|-)*([A-Z])"
 
-# Comments
-color brightblue "#[^`]*"
-color brightblue start="#`\(" end=")"
-color brightblue start="#`\[" end="]"
-
 # Single quoted strings
 color brightgreen "'([^'])*'"
+
+# Comments - single line
+color brightblue "#[^`|=]*"
+
+# Comments - embedded / multi line 
+color brightblue start="#`\(" end="\)"
+color brightblue start="#`\[" end="\]"
+
+# Pod Declarator blocks - single line
+color brightblue "#[|=] .*"
+
+# Pod Declarator blocks - multi line
+color brightblue start="#[|=]\(" end="\)"
+color brightblue start="#[|=]\[" end="\]"
 
 # Heredocs
 color brightgreen start="qq?:to\/END\/;" end="^END"
