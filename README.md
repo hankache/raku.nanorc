@@ -1,9 +1,11 @@
-# perl6.nanorc
-Nano syntax highlighting for Perl 6
+# raku.nanorc
+Raku Syntax Highlighting for Nano
 
 ## How To:
-1. Place ```perl6.nanorc``` somehwere (usually under ```~/.nano```)
-2. Add the following line ```include "~/.nano/perl6.nanorc"``` to your ```~/.nanorc``` file
+1. Place ```raku.nanorc``` somehwere (usually under ```~/.nano```)
+2. Add the following line ```include "~/.nano/raku.nanorc"``` to your ```~/.nanorc``` file
+
+#### To highlight files with legacy extensions (.p6, .pm6), use perl6.nanorc
 
 ## Screenshots
 ![Screenshot 1](screenshot1.png)
