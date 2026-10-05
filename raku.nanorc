@@ -4,102 +4,165 @@
 # Author:  Naoum Hankache
 # License: GPL 3 or later
 #
-# Last Modified: 2019-11-23
+# Last Modified: 2026-10-05
 ##############################################################################
+#
+# How this file works
+#
+# Nano paints the rules in the order they appear and later rules paint over
+# earlier ones, so the order below matters. Its regexes have no lookaround,
+# and "-" and "'" count as word boundaries, which Raku identifiers allow.
+# Words are therefore painted first, then kebab-case identifiers are reset
+# to the normal colour, then the builtins that contain a hyphen are painted.
+#
+# Only the terminal's own palette is used and plain text is left unpainted,
+# so the colours follow the terminal theme, light or dark.
+#
+# Bold ("bright") is kept for keywords, phasers and builtin types, so that
+# they stand out. Comments are bold too, as plain blue is hard to read on a
+# dark background.
 
-syntax "Raku" "\.raku(mod|doc|test)?$"
-header "(^use v6(.[a-z])?;$)|(^#!.*raku)"
+syntax "Raku" "\.(raku(mod|doc|test)?|p[lm]?6|pod6|t6)$"
+header "^#!.*(raku|perl6)" "^[[:space:]]*use v6\>"
+comment "#"
 
-# Default
-color brightwhite "^.+$"
-
-# Traits
-color brightyellow "\<(rw|required|native|repr|export|symbol)\>"
-
-# Booleans
-color brightyellow "\<(True|False)\>"
-
-# Ops
-color brightwhite "\<(eq|ne|gt|lt|le|ge|div|gcd|lcm|leg|cmp|ff)\>"
-color brightwhite "=|=>|==|!=|<|>|<=|>=|\+|\*|-|/|~|\*\*|%|%%|<=>|~~|\+\+|\-\-|\?|!|\.\.|\.\.\^|\^\.\.|\^\.\.\^|\^|\.\.\.|\||\."
-
-# Types
-color brightcyan "\<(Any|Array|Associative|AST|atomicint|Attribute|Backtrace|Backtrace::Frame|Bag|Baggy|BagHash|Blob|Block|Bool|Buf|Callable|CallFrame|Cancellation|Capture|Channel|Code|compiler|Complex|ComplexStr|Cool|CurrentThreadScheduler|Cursor|Date|Dateish|DateTime|Distro|Duration|Encoding|Exception|Failure|FatRat|Grammar|Hash|HyperWhatever|Instant|Int|IntStr|IO|IO::ArgFiles|IO::CatHandle|IO::Handle|IO::Notification|IO::Path|IO::Path::Cygwin|IO::Path::QNX|IO::Path::Unix|IO::Path::Win32|IO::Pipe|IO::Socket|IO::Socket::Async|IO::Socket::INET|IO::Spec|IO::Spec::Cygwin|IO::Spec::QNX|IO::Spec::Unix|IO::Spec::Win32|IO::Special|Iterable|Iterator|Junction|Kernel|Label|List|Lock|Lock::Async|Macro|Map|Match|Metamodel::AttributeContainer|Metamodel::C3MRO|Metamodel::ClassHOW|Metamodel::EnumHOW|Metamodel::Finalization|Metamodel::MethodContainer|Metamodel::MROBasedMethodDispatch|Metamodel::MultipleInheritance|Metamodel::Naming|Metamodel::Primitives|Metamodel::PrivateMethodContainer|Metamodel::RoleContainer|Metamodel::Trusting|Method|Mix|MixHash|Mixy|Mu|NFC|NFD|NFKC|NFKD|Nil|Num|Numeric|NumStr|ObjAt|Order|Pair|Parameter|Perl|Pod::Block|Pod::Block::Code|Pod::Block::Comment|Pod::Block::Declarator|Pod::Block::Named|Pod::Block::Para|Pod::Block::Table|Pod::Heading|Pod::Item|Positional|PositionalBindFailover|Proc|Proc::Async|Promise|Proxy|PseudoStash|QuantHash|Range|Rat|Rational|RatStr|Real|Regex|Routine|Scalar|Scheduler|Semaphore|Seq|Set|SetHash|Setty|Signature|Slip|Stash|Str|StrDistance|Stringy|Sub|Submethod|Supplier|Supplier::Preserving|Supply|Systemic|Tap|Telemetry|Telemetry::Instrument::Thread|Telemetry::Instrument::Usage|Telemetry::Period|Telemetry::Sampler|Thread|ThreadPoolScheduler|UInt|Uni|utf8|Variable|Version|VM|Whatever|WhateverCode|WrapHandle|int|uint|num|str)\>"
-
-# Exceptions
-color brightcyan "\<(X::AdHoc|X::Anon::Augment|X::Anon::Multi|X::Assignment::RO|X::Attribute::NoPackage|X::Attribute::Package|X::Attribute::Undeclared|X::Augment::NoSuchType|X::Bind|X::Bind::NativeType|X::Bind::Slice|X::Caller::NotDynamic|X::Channel::ReceiveOnClosed|X::Channel::SendOnClosed|X::Comp|X::Composition::NotComposable|X::Constructor::Positional|X::ControlFlow|X::ControlFlow::Return|X::DateTime::TimezoneClash|X::Declaration::Scope|X::Declaration::Scope::Multi|X::Does::TypeObject|X::Eval::NoSuchLang|X::Export::NameClash|X::Inheritance::NotComposed|X::Inheritance::Unsupported|X::IO|X::IO::Chdir|X::IO::Chmod|X::IO::Copy|X::IO::Cwd|X::IO::Dir|X::IO::DoesNotExist|X::IO::Link|X::IO::Mkdir|X::IO::Move|X::IO::Rename|X::IO::Rmdir|X::IO::Symlink|X::IO::Unlink|X::Method::InvalidQualifier|X::Method::NotFound|X::Method::Private::Permission|X::Method::Private::Unqualified|X::Mixin::NotComposable|X::NoDispatcher|X::Numeric::Real|X::NYI|X::Obsolete|X::OS|X::OutOfRange|X::Package::Stubbed|X::Parameter::Default|X::Parameter::MultipleTypeConstraints|X::Parameter::Placeholder|X::Parameter::Twigil|X::Parameter::WrongOrder|X::Phaser::Multiple|X::Phaser::PrePost|X::Placeholder::Block|X::Placeholder::Mainline|X::Pod|X::Proc::Async|X::Proc::Async::AlreadyStarted|X::Proc::Async::CharsOrBytes|X::Proc::Async::MustBeStarted|X::Proc::Async::OpenForWriting|X::Proc::Async::TapBeforeSpawn|X::Proc::Unsuccessful|X::Promise::CauseOnlyValidOnBroken|X::Promise::Vowed|X::Redeclaration|X::Role::Initialization|X::Seq::Consumed|X::Sequence::Deduction|X::Signature::NameClash|X::Signature::Placeholder|X::Str::Numeric|X::StubCode|X::Syntax|X::Syntax::Augment::WithoutMonkeyTyping|X::Syntax::Comment::Embedded|X::Syntax::Confused|X::Syntax::InfixInTermPosition|X::Syntax::Malformed|X::Syntax::Missing|X::Syntax::NegatedPair|X::Syntax::NoSelf|X::Syntax::Number::RadixOutOfRange|X::Syntax::P5|X::Syntax::Regex::Adverb|X::Syntax::Regex::SolitaryQuantifier|X::Syntax::Reserved|X::Syntax::Self::WithoutObject|X::Syntax::Signature::InvocantMarker|X::Syntax::Term::MissingInitializer|X::Syntax::UnlessElse|X::Syntax::Variable::Match|X::Syntax::Variable::Numeric|X::Syntax::Variable::Twigil|X::Temporal|X::Temporal::InvalidFormat|X::TypeCheck|X::TypeCheck::Assignment|X::TypeCheck::Binding|X::TypeCheck::Return|X::TypeCheck::Splice|X::Undeclared)\>"
+# Numbers
+color yellow "\<[0-9][0-9_]*(\.[0-9][0-9_]*)?([eE][+-]?[0-9]+)?i?\>"
+color yellow "\<0(x[0-9A-Fa-f_]+|o[0-7_]+|b[01_]+|d[0-9_]+)\>"
+color yellow "\<(pi|tau)\>|π|τ|∞"
 
 # Subs
-color brightcyan "\<(Bool|EVALFILE|MAIN|T|USAGE|abs|acos|acosec|acosech|acosh|acotan|acotanh|asec|asech|asin|asinh|atan|atan2|atanh|atomic-assign|atomic-dec-fetch|atomic-fetch|atomic-fetch-add|atomic-fetch-dec|atomic-fetch-inc|atomic-fetch-sub|atomic-inc-fetch|await|bag|callframe|callsame|callwith|cas|categorize|ceiling|cglobal|chars|chdir|chmod|chomp|chop|chr|chrs|cis|classify|codes|comb|combinations|cos|cosec|cosech|cosh|cotan|cotanh|cross|defined|die|dir|elems|end|exit|exp|explicitly-manage|expmod|fc|first|flat|flip|floor|full-barrier|gist|grep|index|indir|infix:<+>|infix:<->|is-prime|item|join|keys|kv|lastcall|lc|lines|log|log10|map|mix|mkdir|nativecast|nativesizeof|nextcallee|nextsame|nextwith|open|ord|ords|pack|pairs|parse-base|parse-names|periods|permutations|pick|pop|print|produce|prompt|push|put|rand|reduce|repeated|report|reverse|rindex|rmdir|roll|roots|rotate|round|roundrobin|run|samecase|samemark|samewith|say|sech|set|shell|shift|signal|sin|sinh|sleep|sleep-timer|sleep-until|slip|slurp|snap|snapper|sort|splice|split|sprintf|spurt|sqrt|squish|srand|subbuf-rw|substr|sum|take|take-rw|tan|tanh|tc|tclc|trim|trim-leading|trim-trailing|truncate|uc|uniparse|unique|unival|unshift|val|values|warn|wordcase|words|zip)\>"
+color cyan "\<(abs|acos|acosec|acosech|acosh|acotan|acotanh|all|any|append|asec|asech|asin|asinh|atan|atan2|atanh|await|bag|cache|callframe|callsame|callwith|cas|categorize|ceiling|chars|chdir|chmod|chomp|chop|chown|chr|chrs|cis|classify|close|comb|combinations|copy|cos|cosec|cosech|cosh|cotan|cotanh|cross|deepmap|defined|die|dir|done|duckmap|elems|emit|end|exit|exp|expmod|fail|fc|first|flat|flip|floor|get|getc|gist|goto|grep|hash|head|index|indices|indir|item|join|keys|kv|last|lastcall|lc|leave|lines|link|list|log|log10|log2|lsb|make|map|max|min|minmax|mix|mkdir|move|msb|next|nextcallee|nextsame|nextwith|nodemap|none|note|one|open|ord|ords|pair|pairs|permutations|pick|pop|prepend|print|printf|proceed|produce|prompt|push|put|rand|redo|reduce|rename|repeated|repl|return|reverse|rindex|rmdir|roll|roots|rotate|rotor|round|roundrobin|run|samecase|samemark|samewith|say|sec|sech|set|shell|shift|sign|signal|sin|sinh|skip|sleep|slip|slurp|snip|snitch|sort|splice|split|sprintf|spurt|sqrt|squish|srand|substr|succeed|sum|symlink|tail|take|tan|tanh|tc|tclc|trans|trim|truncate|uc|unimatch|uniname|uninames|uniparse|uniprop|uniprops|unique|unival|univals|unlink|unpolar|unshift|val|values|warn|wordcase|words|zip)\>"
+
+# Test module
+color cyan "\<(plan|todo|skip|diag|subtest|pass|flunk|ok|nok|isnt|like|unlike)\>"
+
+# NativeCall
+color cyan "\<(cglobal|nativecast|nativesizeof)\>"
+color brightcyan "\<(long|longlong|ulong|ulonglong|size_t|ssize_t|bool|void)\>"
+
+# Native types
+color brightcyan "\<(array|atomicint|byte|int|int16|int32|int64|int8|num|num32|num64|str|uint|uint16|uint32|uint64|uint8|utf16|utf32|utf8)\>"
+
+# Keywords
+color brightmagenta "\<(my|our|has|state|let|temp|anon|augment|supersede|constant|enum|subset|unit|class|role|grammar|module|package|sub|method|submethod|multi|proto|only|macro|token|rule|regex|is|does|but|of|returns|handles|trusts|hides|also|will|where|use|no|need|import|require|if|elsif|else|unless|with|orwith|without|for|given|when|default|loop|while|until|repeat|do|try|gather|start|react|whenever|supply|once|quietly|lazy|eager|hyper|race|sink|return|proceed|succeed|last|next|redo|make|made|self)\>"
+
+# Traits and pragmas, which only count after "is" and "use" or "no"
+color yellow "\<is[[:space:]]+(rw|readonly|copy|raw|required|built|export|default|dynamic|pure|nodal|native|nativesize|symbol|encoded|repr|tighter|looser|equiv|assoc|cached)\>"
+color yellow "\<(use|no)[[:space:]]+(experimental|fatal|internals|invocant|isms|lib|newline|nqp|precompilation|soft|strict|trace|variables|worries)\>"
+color brightmagenta "\<(is|use|no)\>"
 
 # Methods
-color brightcyan "\<(ACCEPTS|ASSIGN-KEY|ASSIGN-POS|AT-KEY|AT-POS|Array|BIND-KEY|BIND-POS|Bag|BagHash|Bool|Bridge|CALL-ME|CREATE|Capture|Channel|Complex|DELETE-KEY|DELETE-POS|DESTROY|DISTROnames|Date|DateTime|EVAL|EXISTS-KEY|EXISTS-POS|Hash|IO|IO::Notification.watch-path|Instant|Int|KERNELnames|List|Map|Mix|MixHash|NFC|NFD|NFKC|NFKD|Num|Numeric|Promise|Rat|Real|SPEC|Set|SetHash|Slip|Str|Supply|VMnames|WHERE|WHEREFORE|WHICH|WHY|abs|abs2rel|absolute|accept|accessed|acquire|act|action|actions|add|add_attribute|add_enum_value|add_fallback|add_method|add_parent|add_private_method|add_role|add_trustee|adverb|after|all|allocate|allof|allowed|alternative-names|annotations|antipair|antipairs|any|anyof|app_lifetime|append|arch|archname|args|arity|assuming|ast|at|attributes|auth|backtrace|base|base-repeating|basename|batch|bind-stderr|bind-stdin|bind-stdout|bind-udp|bits|bless|block|bool-only|bounds|break|broken|build-date|bytes|cache|calling-package|can|cancel|candidates|cando|canonpath|caps|caption|capture|catdir|categorize|categorize-list|catfile|catpath|cause|ceiling|changed|channel|chdir|child|child-name|child-typename|chmod|chomp|chunks|classify|classify-list|cleanup|clone|close|close-stdin|closed|code|codes|collate|column|comb|combinations|command|comment|compiler|compose|compose_type|composer|condition|config|configure_destroy|configure_type_checking|conj|connect|constraints|construct|contains|contents|copy|count|count-only|cpu-cores|cpu-usage|create_type|cue|curdir|curupdir|d|day|day-of-month|day-of-week|day-of-year|daycount|days-in-month|declaration|decode|decoder|deepmap|default|defined|delayed|denominator|desc|destroyers|devnull|did-you-mean|dir-sep|dirname|do|does|done|duckmap|dynamic|e|eager|earlier|elems|emit|enclosing|encode|encoder|encoding|end|ends-with|enum_from_value|enum_value_list|enum_values|enums|eof|exception|excludes-max|excludes-min|exitcode|exp|expected|extension|f|fail|feature|file|filename|find_method|find_method_qualified|finish|first|flat|flatmap|floor|flush|fmt|format|formatter|freeze|from|from-list|from-loop|from-posix|full|get|get_value|getc|gist|got|grab|grabpairs|grep|handle|handled|handles|hardware|has_accessor|hash|head|headers|hh-mm-ss|hidden|hides|hour|how|hyper|id|illegal|im|in|in-timezone|indent|indices|infinite|infix|install_method_cache|instead|int-bounds|interval|invalid-str|invert|invocant|is-absolute|is-hidden|is-initial-thread|is-int|is-lazy|is-leap-year|is-relative|is-routine|is-setting|is-win|isNaN|is_trusted|is_type|isa|item|iterator|join|keep|kept|key|keyof|keys|kill|kv|kxxv|l|lang|last|later|lazy|leading|level|line|lines|link|list|listen|live|local|lock|lookup|lsb|made|make|map|match|max|maxpairs|merge|message|method|method_table|methods|migrate|min|minmax|minpairs|minute|misplaced|mode|modified|month|move|msb|multi|multiness|my|name|named|named_names|narrow|native-descriptor|new|new-from-daycount|new-from-pairs|new_type|next|next-handle|nl-in|nl-out|nodemap|none|norm|not|note|now|nude|numerator|of|offset|offset-in-hours|offset-in-minutes|old|on-close|on-switch|one|open|opened|operation|optional|ords|orig|os-error|osname|out-buffer|package|package-kind|package-name|packages|pair|pairs|pairup|parameter|params|parent|parent-name|parents|parse|parsefile|parts|path|path-sep|payload|peer-host|peer-port|perl|permutations|phaser|pick|pickpairs|pid|placeholder|plus|polar|poll|polymod|pop|pos|positional|posix|postfix|postmatch|precomp-ext|precomp-target|pred|prefix|prematch|prepend|print|print-nl|print-to|printf|private|private_method_table|proc|produce|promise|protect|pull-one|push|push-all|push-at-least|push-exactly|push-until-lazy|put|qualifier-type|quit|r|race|radix|rand|range|raw|re|read|readchars|readonly|ready|reallocate|reals|reason|rebless|receive|recv|redispatcher|redo|reduce|rel2abs|relative|release|rename|repeated|replacement|reserved|resolve|restore|result|resume|rethrow|reverse|right|role|roles_to_compose|rolish|roll|rootdir|roots|rotor|round|routine-type|run|rwx|s|say|schedule-on|scheduler|scope|sec|second|seek|self|send|set-instruments|set_hidden|set_name|set_package|set_rw|set_value|setup_finalization|shape|share|shell|shift|sibling|sigil|sign|signal|signals|signature|sink|sink-all|skip|skip-at-least|skip-at-least-pull-one|skip-one|slurp|slurp-rest|slurpy|so|socket-host|socket-port|sort|source|source-package|spawn|splice|split|splitdir|splitpath|spurt|sqrt|squish|stable|start|started|starts-with|status|stderr|stdout|sub_signature|subbuf|subbuf-rw|subname|subparse|subst|subst-mutate|substr-eq|substr-rw|succ|sum|symlink|t|tail|take|tap|target|target-name|tell|then|throttle|throw|timezone|tmpdir|to|to-posix|today|toggle|total|trailing|trans|tree|trim|trim-leading|trim-trailing|truncate|truncated-to|trusts|try_acquire|trying|twigil|type|type_captures|typename|udp|uncaught_handler|unimatch|uniname|uninames|uniprop|uniprops|unique|unival|univals|unlink|unlock|unpack|unpolar|unshift|unwrap|updir|utc|value|values|variable|verbose-config|version|volume|vow|w|wait|watch|watch-path|week|week-number|week-year|weekday-of-month|what|when|whole-second|words|workaround|wrap|write|write-to|x|yada|year|yield|yyyy-mm-dd|z|zip|zip-latest|WHAT|WHO|HOW|DEFINITE|VAR|mro|BUILD)\>"
+color cyan "\.[=^?]?(abs|abs2rel|absolute|abspath|accept|accessed|acos|acosec|acosech|acosh|acotan|acotanh|acquire|act|action|actions|add|add_attribute|add_conc_to_cache|add_concretization|add_enum_value|add_fallback|add_meta_method|add_method|add_multi_method|add_multi_methods|add_parent|add_phaser|add_private_method|add_role|add_stash|add_trustee|addendum|additional|adverb|after|after_scan|aggregate|alias|all|all_method_table|allocate|allof|allowed|alnum|alpha|alternative|alternatives|ambiguous|andthen|annotations|antipair|antipairs|any|anyof|api|app_lifetime|append|apply_handles|arch|archetypes|archname|are|arg|arg0|args|arguments|arity|array_type|asec|asech|asin|asinh|assoc|associative|assuming|ast|at|atan|atan2|atanh|attribute|attribute_table|attributes|auth|available|await|backend|backlog|backtrace|base|basename|batch|before|big|bits|blank|bless|block|body_block|boundary|bounds|braid|branch|break|broken|byte|bytecode|bytes|c3_merge|cache|cache_add|cache_get|call|callable_for_phaser|callframe|callsites|can|cancel|cancelled|candidates|cando|canonpath|caps|caption|capture|catdir|categorize|category|catfile|catpath|cause|ceiling|chain|changed|channel|char|characters|chars|chdir|check|check_LANG_oopsies|check_PACKAGE_oopsies|checkee_eqaddr_list|checkee_istype_list|checksum|child|chmod|chomp|chop|chown|chr|chrs|chunks|circumfix|cis|class|classify|cleanup|clear|clone|clone_braid_from|close|closed|closer|cntrl|code|code_of_method|codename|codes|coerce_type|collate|column|comb|combinations|combinator|command|comment|compiler|complainee|composalize|compose|compose_attributes|compose_meta_methods|compose_repr|compose_values|composer|compute_mro|concise|concretization|concretization_lookup|concretizations|condition|config|configuration|configure_punning|conj|connect|constraint|constraint_list|constraints|construct|container|containerized|contains|content|contents|copy|cos|cosec|cosech|cosh|cotan|cotanh|could_not_instantiate|count|create_BUILDPLAN|created|ctxsave|cue|curdir|curupdir|d|day|daycount|dba|decl|declaration|declarator|declares_method|declaring|decode|decoder|deepmap|default|define_slang|defined|delayed|delete|denominator|dependencies|desc|deserialize|destination|destroyers|details|dev|devnull|devtype|die|diffy|digit|dim|dimensions|dir|directive|directives|dirname|disallowed|dispatcher|dist|distribution|do|does|done|duckmap|dump|dynamic|e|eager|earlier|elems|emit|enc|enclosing|encode|encoder|encoding|end|endian|endpoint|enum_from_value|enum_value_list|enum_values|enums|eof|equiv|err|evaluate_unquotes|event|exception|exceptions|exclude_parent|exitcode|exp|expected|expectedn|explain|expmod|extension|extensions|f|fail|family|fc|feature|fiddly|file|filename|files|find|find_method|find_method_fallback|find_method_qualified|find_private_method|finish|fire_if_phasers|fire_phasers|first|flags|flat|flatmap|flavor|flip|floor|flush|flush_cache|fmt|for|format|formatter|found|freeze|from|from1|from2|full|generate_mixin|get|get_attribute_for_usage|get_boolification_mode|get_cached_conc|get_container_spec|get_default_parent_type|get_value|getc|gid|gist|gistseen|goal|got|gotn|goto|grab|grabpairs|grammar|graph|grep|group|handle|handle_uncaught|handled|handles|hardware|has_attribute|has_default_parent_type|has_fallbacks|has_multi_candidate|has_public_attribute|hash|head|headers|hidden|hides|hides_parent|highexpect|hint|host|hostname|hour|how|hyper|id|ident|idx|iffy|illegal|im|implicit|in|incarnate|incorporate_multi_candidates|indent|index|indices|inf|infinite|infix|inheritalize|init|inlined|inner|inode|ins_roles|install|installed|instantiate_generic|instead|int|int16|int32|int64|int8|interactive_prompt|interval|invalidate_method_caches|invalidate_mro_cache|invert|invocant|isNaN|is_array_type|is_composed|is_default_generic|is_generic|is_method_call_punned|is_mixin|is_pun|is_quasi_ast|is_trusted|isa|item|iterator|join|keep|kept|key|keyof|keys|keyword|kill|kind|kinds|know_how|kv|kxxv|l|lang|language_revision|last|later|lazy|lc|leading|leave|left|level|line|lines|link|list|list_istype_checkee|listen|listening|literal|live|load|loaded|loads|local|localhost|localizer|localport|lock|locprepost|log|log10|log2|lookup|looser|lower|lsb|macro|made|make|make_pun|map|match|max|max_threads|maxpairs|maybe|merge|mess|message|meta|meta_method_table|meta_methods|metachar|method|method_names|method_not_implemented|method_order|method_table|methods|migrate|min|minmax|minpairs|minus|minute|misplaced|missing|mixin|mixin_attribute|mixin_base|mkdir|mode|modified|modifier|modifiers|modules|month|move|mro|mro_unhidden|msb|multi|multi_methods_to_incorporate|multiness|my|name|named|named_names|nameds|narrow|native|need|needparens|needs|new|new_type|next|nice|no_single_attribute|nodemap|nogo|nomark|nominal_type|nominalizable|none|norm|not|not_composable|note|now|nude|num|numerator|object|objname|of|offset|old|omitted|one|onearg|op|open|opened|opener|operation|operator|opname|optional|options|ord|ords|orelse|orig|osname|out|out_of_range|outer|package|package_at_key|packages|pair|pairs|pairup|panic|param|parameter|parameterize|params|parent|parents|parse|parsefile|parts|path|payload|perl|perlseen|permutations|phaser|phasers|pick|pickpairs|pid|placeholder|plus|polar|poll|polymod|pop|pop_role_to_compose|port|pos|positional|posix|post|post_types|postcircumfix|postfix|postmatch|pragma|pre|prec|precedence|precision|precompile|precompiled|pred|prefix|prefixes|prematch|prepend|pretend_to_be|pretending_to_be|primary|print|printf|priors|private|private_method_names|private_method_table|private_methods|proc|process|produce|promise|protect|proto|protoguilt|prune|pty|publish_boolification_spec|publish_container_spec|publish_method_cache|publish_type_cache|pun|pun_repr|pun_source|punct|push|put|quaternary|queue|quit|r|race|radix|raku|rakuseen|rand|range|raw|re|read|readchars|readlink|readonly|ready|reallocate|reals|reason|receive|recursing|recv|redispatcher|redo|reduce|reducer|refine_slang|register|rel2abs|relative|release|remove|removed|rename|repeated|replacement|repo|report|repos|repr_composed|reserved|resolve|resolve_instantiations|resolve_repossession_conflicts|resource|result|resume|rethrow|return|returns|reverse|right|rindex|rmdir|role|role_typecheck_list|roles|roles_to_compose|rolish|roll|rootdir|roots|rotate|rotor|round|routine|routine_suggestion|run|run_if_not_composed|rw|rwx|s|same|samecase|samemark|samespace|sane|sanitize|say|scheduler|scope|sec|sech|second|secondary|seek|select|self|send|sequence|serial|serialize|set|set_actions|set_api|set_array_type|set_auth|set_autogen_proto|set_base_type|set_body_block|set_boolification_mode|set_braid|set_braid_from|set_composalizer|set_composed|set_container_spec|set_default|set_default_parent_type|set_docee|set_dynamic|set_export_callback|set_group|set_hidden|set_how|set_identity|set_is_mixin|set_language_revision|set_language_version|set_mixin_attribute|set_name|set_of|set_package|set_pragma|set_pun_repr|set_pun_source|set_rw|set_shortname|set_value|set_ver|set_why|setup_finalization|setup_junction_fallback|setup_mixin_cache|shape|share|shell|shift|shortname|sibling|side|sigil|sign|signal|signal_all|signals|signature|signature_constraint|signatured|sin|sinh|sink|size|skip|slang_actions|slang_grammar|slangs|slash|slice|slurp|slurpy|snapshot_braid|snip|snitch|so|soft|sorrows|sorry_heading|sort|source|space|spaces|spawn|spec|specialize|specialize_with|specification|splice|split|splitdir|splitpath|sprintf|spurt|sqrt|squish|src|stable|start|started|statement|static_id|status|stderr|stdout|stem|store|stringified|sub_signature|subbuf|submethod_table|subname|subparse|subst|substr|subtype|succ|suffix|suggestion|suggestions|suggestiontype|sum|summary|supported|switch_to_slang|symbol|symbols|symlink|t|tag|tai|tail|take|tan|tanh|tap|target|tc|tclc|teardown|tell|term|ternary|tertiary|text|then|thing|throttle|throw|throw_compound_attribute_NYI|throw_duplicate|throw_incompat_revisions|throw_typecheck|thunky|tighter|timezone|tips|tmpdir|to|today|toggle|topic|total|trailing|trans|tree|trim|truncate|trusts|try_acquire|trying|twigil|type|type_captures|type_check|type_check_parents|type_suggestion|typed_exception|typename|uc|udp|uid|uint|uint16|uint32|uint64|uint8|uncaught_handler|unexpected|unimatch|uniname|uninames|uninstall|uniparse|uniprop|uniprops|unique|unit|unival|univals|unk_routines|unk_types|unlink|unlock|unpack|unpolar|unset|unshift|untyped|unwrap|updir|upper|usage|use|user|using|utc|value|values|valuetype|var|variable|variable_name|varname|vartype|ver|version|volume|vow|w|wait|watch|wb|week|what|whatever|when|where|why|willdo|wipe_conc_cache|word|wordcase|words|workaround|worries|wrap|write|wrong_body_result|ws|ww|x|xdigit|year|yield|z|zip)\>"
 
-# Pragmas
-color brightyellow "\<(MONKEY-SEE-NO-EVAL|MONKEY-TYPING|MONKEY-GUTS|MONKEY|experimental|fatal|lib|newline|nqp)\>"
+# Versions
+color yellow "\<v[0-9]+(\.([0-9]+|\*|[a-z]\>))*(\.PREVIEW\>)?\+?"
+
+# Kebab-case identifiers are not any of the words above
+color normal "(\.[=^?]?)?[[:alpha:]_][[:alnum:]_]*(['-][[:alpha:]_][[:alnum:]_]*)+"
+
+# Neither are named arguments and pair keys
+color normal ":!?[[:alpha:]_][[:alnum:]_-]*"
+color normal "\<[[:alpha:]_][[:alnum:]_'-]*[[:space:]]*=>"
+
+# Types: any capitalised name
+color cyan "\<[A-Z][[:alnum:]_]+(-[[:alpha:]_][[:alnum:]_]*)*"
 
 # Phasers
 color brightmagenta "\<(BEGIN|CHECK|INIT|END|CLOSE|ENTER|LEAVE|KEEP|UNDO|PRE|POST|FIRST|NEXT|LAST|CATCH|CONTROL|QUIT|DOC)\>"
 
-# Keywords
-color brightmagenta "\<(my|our|class|role|grammar|is|does|sub|method|submethod|try|CATCH|default|when|if|elsif|else|unless|with|orwith|without|for|given|proceed|succeed|loop|while|until|repeat|module|use|need|import|require|unit|constant|enum|multi|return|has|token|rule|make|made|proto|state|augment|but|anon|supersede|let|subset|gather|returns|return-rw)\>"
+# Capitalised and hyphenated traits and pragmas
+color yellow "\<(DEPRECATED|hidden-from-backtrace|implementation-detail|test-assertion)\>"
+color yellow "\<MONKEY(-[A-Z]+)*\>"
 
-# Test Module
-color brightcyan "\<(plan|done-testing|bail-out|todo|skip|skip-rest|diag|subtest|pass|flunk|ok|nok|cmp-ok|is-deeply|isnt|is-approx|like|unlike|use-ok|isa-ok|does-ok|can-ok|dies-ok|lives-ok|eval-dies-ok|eval-lives-ok|throws-like|fails-like)\>"
+# Booleans and other terms
+color yellow "\<(True|False|Empty|Inf|NaN)\>"
 
-# Numbers
-color brightyellow "[[:digit:]]"
-color brightyellow "[[:digit:]]*(\.|_)[[:digit:]]+"
-color brightyellow "[[:digit:]]+(e)[[:digit:]]+"
-color brightyellow "[[:digit:]]*(\+)*([[:digit:]]|NaN\\|Inf\\)+i"
+# Types: names with a namespace, then the builtin ones
+color cyan "\<[A-Z][[:alnum:]_]*(::[[:alpha:]_][[:alnum:]_]*)+"
+color brightcyan "\<(AST|Allomorph|Any|Array|Array::Shaped|Array::Shaped1|Array::Shaped2|Array::Shaped3|Array::Slice|Array::Slice::Access|Array::Slice::Assign|Array::Slice::Bind|Array::Typed|Associative|Attribute|Awaitable|Awaitable::Handle|Awaiter|Backtrace|Backtrace::Frame|Bag|BagHash|Baggy|Blob|Block|Bool|Buf|CX|CX::Done|CX::Emit|CX::Last|CX::Next|CX::Proceed|CX::Redo|CX::Return|CX::Succeed|CX::Take|CX::Warn|CallFrame|Callable|Cancellation|Capture|Channel|Code|Collation|CompUnit|CompUnit::DependencySpecification|CompUnit::Handle|CompUnit::Loader|CompUnit::PrecompilationDependency|CompUnit::PrecompilationDependency::File|CompUnit::PrecompilationId|CompUnit::PrecompilationRepository|CompUnit::PrecompilationRepository::Default|CompUnit::PrecompilationStore|CompUnit::PrecompilationStore::File|CompUnit::PrecompilationStore::FileSystem|CompUnit::PrecompilationUnit|CompUnit::PrecompilationUnit::File|CompUnit::Repository|CompUnit::Repository::AbsolutePath|CompUnit::Repository::Distribution|CompUnit::Repository::FileSystem|CompUnit::Repository::Installable|CompUnit::Repository::Installation|CompUnit::Repository::Locally|CompUnit::Repository::NQP|CompUnit::Repository::Perl5|CompUnit::Repository::Spec|CompUnit::Repository::Unknown|CompUnit::RepositoryRegistry|Compiler|Complex|ComplexStr|ContainerDescriptor|Cool|CurrentThreadScheduler|Cursor|Date|DateTime|Dateish|Deprecation|Distribution|Distribution::Hash|Distribution::Locally|Distribution::Path|Distribution::Resource|Distribution::Resources|Distro|Duration|Encoding|Encoding::Builtin|Encoding::Decoder|Encoding::Decoder::Builtin|Encoding::Encoder|Encoding::Encoder::Builtin|Encoding::Encoder::TranslateNewlineWrapper|Encoding::Registry|Endian|Enumeration|Exception|Exceptions|Exceptions::JSON|Failure|FatRat|FileChangeEvent|Format|Formatter|Formatter::Syntax|Grammar|HardRoutine|Hash|Hash::Object|Hash::Ordered|Hash::Typed|HyperSeq|HyperWhatever|IO|IO::ArgFiles|IO::CatHandle|IO::Handle|IO::Notification|IO::Notification::Change|IO::Path|IO::Path::Cygwin|IO::Path::Parts|IO::Path::QNX|IO::Path::Spec|IO::Path::Unix|IO::Path::Win32|IO::Pipe|IO::Socket|IO::Socket::Async|IO::Socket::Async::ListenSocket|IO::Socket::Async::Port-Number|IO::Socket::INET|IO::Spec|IO::Spec::Cygwin|IO::Spec::QNX|IO::Spec::Unix|IO::Spec::Win32|IO::Special|Instant|Int|IntStr|Iterable|IterationBuffer|Iterator|JSONException|Junction|Kernel|Label|List|Lock|Lock::Async|Lock::ConditionVariable|Lock::Soft|Macro|Map|Match|Metamodel|Metamodel::Archetypes|Metamodel::ClassHOW|Metamodel::CoercionHOW|Metamodel::ConcreteRoleHOW|Metamodel::Configuration|Metamodel::CurriedRoleHOW|Metamodel::DefiniteHOW|Metamodel::EnumHOW|Metamodel::GenericHOW|Metamodel::GrammarHOW|Metamodel::ModuleHOW|Metamodel::NativeHOW|Metamodel::NativeRefHOW|Metamodel::PackageHOW|Metamodel::ParametricRoleGroupHOW|Metamodel::ParametricRoleHOW|Metamodel::Primitives|Metamodel::SubsetHOW|Method|MethodDispatcher|Mix|MixHash|Mixy|Mu|MultiDispatcher|NFC|NFD|NFKC|NFKD|Nil|Num|NumStr|Numeric|NumericEnumeration|NumericStringyEnumeration|ObjAt|Operator|OperatorProperties|Order|Pair|ParallelSequence|Parameter|Perl|Pod|Pod::Block|Pod::Block::Code|Pod::Block::Comment|Pod::Block::Declarator|Pod::Block::Input|Pod::Block::Named|Pod::Block::Output|Pod::Block::Para|Pod::Block::Table|Pod::Config|Pod::Defn|Pod::FormattingCode|Pod::Heading|Pod::Item|Pod::Raw|Positional|PositionalBindFailover|PredictiveIterator|Proc|Proc::Async|Proc::Async::Pipe|Promise|PromiseStatus|ProtocolFamily|ProtocolType|Proxy|PseudoStash|QuantHash|QuantHash::KeyOf|REPL|RaceSeq|Raku|Range|Rat|RatStr|Rational|Real|Regex|Routine|Scalar|Scheduler|SeekType|Semaphore|Seq|Sequence|Set|SetHash|Setty|Signal|Signal::Signally|Signature|SignedBlob|Slang|Slip|SocketType|SoftRoutine|Stash|Str|StrDistance|Stringy|StringyEnumeration|Sub|Submethod|Supplier|Supplier::Preserving|Supply|Systemic|Tap|Tappable|Thread|ThreadPoolScheduler|UInt|Uni|Unicode|UnsignedBlob|VM|ValueObjAt|Variable|Version|Whatever|WhateverCode|WrapDispatcher)\>"
+color brightcyan "\<(X|CX|RakuAST)(::[A-Z][[:alnum:]_]*)+"
+color brightcyan "\<(CArray|Pointer|OpaquePointer)\>"
 
-#Nativecall types
-color brightcyan "\<int8|int16|int32|int64|uint8|uint16|uint32|uint64|long|longlong|num32|num64|size_t|bool|CArray|Pointer\>"
+# Subs and methods that are capitalised or contain a hyphen
+color cyan "\<(DEFINITE|DYNAMIC-FALLBACK|EVAL|EVALFILE|HOW|NYI|REPR|RUN-MAIN|VAR|WHAT|WHERE|WHICH|WHO|atomic-add-fetch|atomic-assign|atomic-dec-fetch|atomic-fetch|atomic-fetch-add|atomic-fetch-dec|atomic-fetch-inc|atomic-fetch-sub|atomic-inc-fetch|atomic-sub-fetch|full-barrier|is-prime|parse-base|parse-names|return-rw|sleep-timer|sleep-until|subbuf-rw|substr-rw|take-rw|trim-leading|trim-trailing)\>"
+color cyan "\.[=^?]?(ACCEPTS|ASSIGN-KEY|ASSIGN-POS|AST|AT-KEY|AT-POS|Array|BIND-KEY|BIND-POS|BUILD|BUILDALL|BUILDALLPLAN|BUILDPLAN|BUILD_LEAST_DERIVED|Bag|BagHash|Baggy|Blob|Bool|Bridge|Buf|CALL-ME|CODE|COERCE|CREATE|CURSOR|CWD|Callable|Capture|Channel|Complex|DEFINITE|DELETE-KEY|DELETE-POS|DESTROY|DISTROnames|DUMP|Date|DateTime|EOF|EVAL|EXISTS-KEY|EXISTS-POS|FAILGOAL|FALLBACK|FLATTENABLE_HASH|FLATTENABLE_LIST|Failure|FatRat|HOW|Hash|INSTANTIATE-GENERIC|IO|Instant|Int|IterationBuffer|KERNELnames|List|Map|Mix|MixHash|Mixy|NFC|NFD|NFG|NFKC|NFKD|NOT-ACCEPTS|Num|Numeric|Order|POPULATE|POSITIONS|PRECURSOR|Pair|Promise|READ|REPR|Range|Rat|Real|SET-COMPLAINEE|SETFAIL|SPEC|STORE|STORE_AT_KEY|Seq|Set|SetHash|Setty|Slip|Str|Stringy|Supply|TOP|TWEAK|Tappable|UInt|UPGRADE-RAT|Uni|VAR|VMnames|Version|WHAT|WHERE|WHEREFORE|WHICH|WHO|WHY|WRITE|ZEN-KEY|add-bytes|already-failure|already-success|alternative-names|api-matcher|associative-reversed|at-line|auth-matcher|available-str|await-all|base-repeating|bind-stderr|bind-stdin|bind-stdout|bind-udp|bool-only|bracket-closer-for-opener|bracket-closers|bracket-opener-for-closer|bracket-openers|bytecode-handle|bytecode-size|bytes-available|calling-package|can-install|categorize-list|check-type-compat|child-name|child-typename|classify-list|close-stdin|collation-level|complainee-message|completions-for-line|connect-path|consume-all-chars|consume-available-chars|consume-exactly-bytes|consume-exactly-chars|consume-line-chars|count-only|cpu-cores|cpu-usage|cur-sep|day-fraction|day-of-month|day-of-week|day-of-year|days-in-month|days-in-year|dd-mm-yyyy|delete-by-compiler|did-you-mean|dir-sep|dir-with-entries|directive-filename|dist-id|do-not-close-automatically|empty-range|enclosing-kind|encode-chars|ends-with|error-code|excludes-max|excludes-min|export-how-package|export-package|export-sub|extract-last-word|file-for-spec|filename-real|first-date-in-month|first-none-setting-line|free-memory|from-args|from-iterator|from-list|from-loop|from-posix|from-posix-nanos|from-slurpy|from-slurpy-flat|from-slurpy-onearg|from-type|from-unit|get-await-handle|globalish-package|got-dimensions|has-loop-phasers|has-phaser|has-phasers|hh-mm-ss|history-file|identifier-name|implicit-lexical-usage|in-class-call|in-range|in-timezone|incompat-revisions|input-incomplete|input-toplevel-control|int-bounds|invalid-str|is-absolute|is-compile-time|is-deterministic|is-empty|is-generic|is-hidden|is-implementation-detail|is-initial-thread|is-int|is-item|is-lazy|is-leap-year|is-monotonically-increasing|is-prime|is-relative|is-reserved-operator|is-routine|is-runtime|is-setting|is-type|is-up-to-date|is-win|is-wrapped|julian-date|known-category|lang-rev|language-revision|language-version|last-date-in-month|left-elems|line-real|listen-path|load-precompilation|load-precompilation-file|load-repo-id|load-source|load-source-file|load-unit|lock-type|may-precomp|merge-symbols|meta-file|method-type|mm-dd|mm-dd-yyyy|modified-julian-date|multi-invocant|must-be-resolved|name-for-repository|native-descriptor|needed-dimensions|new-compat|new-from-ctx|new-from-daycount|new-from-pairs|new-from-string|new-repl-eval|new-unit|new-without-check|next-interesting-index|next-repo|next-term|nl-in|nl-out|non-numeric|non-numeric-range|not-reducible|of-type|offset-in-hours|offset-in-minutes|on-close|on-demand|on-switch|os-error|out-buffer|out-of-dynamic-scope|outer-caller-idx|own-up|package-kind|package-name|package-type|param-is-invocant|parent-name|parse-base|parse-names|path-sep|path-spec|peer-host|peer-port|platform-library-name|precomp-ext|precomp-repository|precomp-store|precomp-target|print-nl|print-to|properties-for-group|protect-or-queue-on-recursion|pseudo-package|pty-cols|pty-rows|pull-one|push-all|push-at-least|push-exactly|push-until-lazy|qualifier-type|read-bits|read-int128|read-int16|read-int32|read-int64|read-int8|read-num32|read-num64|read-ubits|read-uint128|read-uint16|read-uint32|read-uint64|read-uint8|reducer-name|register-name|reification-target|remote-debugging|remove-from-cache|repl-eval|repl-loop|repl-print|replace-with|repo-chain|repo-id|repo-name|repository-for-name|repository-for-spec|request-garbage-collection|reserved-operator-hint|reserved-operators-lookup|reset-backtrace|resize-pty|resolve-unknown-repos|return-rw|right-elems|role-name|roles-ordered|routine-type|run-script|save-to|schedule-on|second-part|set-line-separators|set-properties|setup-repositories|short-circuit|short-id|short-name|should-be-concrete|sink-all|skip-at-least|skip-at-least-pull-one|skip-one|slurp-rest|socket-host|socket-port|source-checksum|source-file|source-indicator|source-name|source-package|source-package-name|source-shape|starts-with|store-file|store-repo-id|store-unit|sub-or-precedence|sub-precedence|subbuf-rw|subscribe-awaiter|subst-mutate|substr-eq|substr-rw|supports-op|target-name|target-shape|target-type|to-nanos|to-posix|total-memory|translate-nl|trim-leading|trim-trailing|truncated-to|try-load|type-a|type-b|update-completions|upgrade-repository|usage-name|use-case|use-repository|vault-backtrace|verbose-config|version-matcher|watch-path|week-number|week-year|weekday-of-month|what-endpoint|whole-second|win-verbatim-args|with-lock-hidden-from-recursion-check|write-bits|write-int128|write-int16|write-int32|write-int64|write-int8|write-num32|write-num64|write-to|write-uint128|write-uint16|write-uint32|write-uint64|write-uint8|writeable-path|yyyy-mm|yyyy-mm-dd|zip-latest)\>"
+color cyan "\<(MAIN|USAGE|GENERATE-USAGE|RUN-MAIN|BUILD|TWEAK|DESTROY|TOP|explicitly-manage)\>"
+color cyan "\<(done-testing|bail-out|skip-rest|cmp-ok|is-deeply|is-approx|use-ok|isa-ok|does-ok|can-ok|dies-ok|lives-ok|eval-dies-ok|eval-lives-ok|throws-like|fails-like|is-run)\>"
+color brightmagenta "\<return-rw\>"
 
-#Regex
-color brightred "(m|rx|tr|TR|s|S)?/.*/"
+# Regex without a prefix. As a slash can also be a division, it only counts
+# after ~~, an opening bracket, a comma, "= ", ": ", some keywords between
+# spaces, or at the start of a line. Whatever came before it is painted
+# again afterwards, which also resets brackets and commas inside the regex.
+color magenta "(~~|[(,{]|[=:][[:space:]]|^|(^|[[:space:]])(when|if|elsif|unless|while|until|return|and|or|not|so|grep|split|comb)[[:space:]])[[:space:]]*/([^/\\'"]|\\.|'[^']*'|"[^"]*")+/"
+color normal "~~|[=:][[:space:]]|[(){},]"
+color normal "(^|[[:space:]])(and|or|not|so)[[:space:]]"
+color brightmagenta "(^|[[:space:]])(when|if|elsif|unless|while|until|return)[[:space:]]"
+color cyan "(^|[[:space:]])(grep|split|comb)[[:space:]]"
+color normal "(^|[[:space:]])(when|if|elsif|unless|while|until|return|and|or|not|so|grep|split|comb)[[:space:]]*=>"
 
-#Regex Match
-color brightcyan "\$\/"
+# Regex with a prefix: m/ /, rx/ /, s/ / /, tr/ / /
+color magenta "\<(m|rx)(:[[:alnum:]]+)*/([^/\\'"]|\\.|'[^']*'|"[^"]*")*/"
+color magenta "\<(s|S|ss|SS|tr|TR)(:[[:alnum:]]+)*/([^/\\'"]|\\.|'[^']*'|"[^"]*")*/([^/\\'"]|\\.|'[^']*'|"[^"]*")*/"
 
 # Sym
-color brightcyan ":sym"
-
-# Versions
-color brightyellow "v([0-9]|\*)(.([[:alnum:]]|\*))*"
+color cyan ":sym\>"
 
 # Angle brackets
-color brightgreen "<([[:alnum:]]|-| |\.|_|\/)*>"
-color brightred "\$<([[:alnum:]]|-|_)*>"
-color brightwhite "(<|>)"
+color green "<[[:alnum:]_./:+*!?@-]([[:alnum:] _./:+*!?@-]*[[:alnum:]_./:+*!?@])?>"
+color green "«[^»]*»"
+color green "｢[^｣]*｣|「[^」]*」"
 
-# Double quoted strings
-color brightgreen "\"([^"])*\""
+# Numbers with a radix
+color yellow ":[0-9]+<[[:alnum:]_.]+>"
+
+# Strings. Both kinds are matched by one rule, so that an apostrophe inside
+# a double quoted string does not start a single quoted one, and vice versa.
+color green ""([^"\\]|\\.)*"|'([^'\\]|\\.)*'"
+color green "“[^”]*”"
+
+# Quoting constructs
+color green "\<(qq|Q|qw|qqw|qx|qqx)(:[a-z]+)*(\{[^}]*\}|\[[^]]*\]|<[^>]*>|/[^/]*/|\|[^|]*\|)"
+color green "\<q(:[a-z]+)*(<[^>]*>|/[^/]*/|\|[^|]*\|)"
 
 # Variables
-color brightred "[$@%&](\.|!|\^)?([[:alpha:]]|_)"
-color brightred "[$@%&](\.|!|^)?([[:alpha:]]|_)([[:alnum:]]|-|_)*([[:alnum:]]|_)"
-color brightred "[$@%&](\?|\*)([A-Z])([A-Z]|-)*([A-Z])"
+color red "\$<[[:alnum:]_-]+>"
+color red "\$([0-9]+|[/!¢])"
+color red "([@%&$]\$|[$@%&])[.!^:*?=~]?[[:alpha:]_][[:alnum:]_]*(['-][[:alpha:]_][[:alnum:]_]*)*"
 
-# Single quoted strings
-color brightgreen "'([^'])*'"
+# Single quoted strings do not interpolate
+color green "'([^'"\\]|\\.)*'"
 
-# Comments - single line
-color brightblue "#[^`|=]*"
+# Comments - single line, including Pod declarator blocks
+color brightblue "(^|[[:space:]])#([^`].*|`([^[({<].*)?)?$"
 
-# Comments - embedded / multi line 
+# Comments - embedded / multi line
 color brightblue start="#`\(" end="\)"
 color brightblue start="#`\[" end="\]"
-
-# Pod Declarator blocks - single line
-color brightblue "#[|=] .*"
+color brightblue start="#`\{" end="\}"
+color brightblue start="#`<" end=">"
+color brightblue start="#`\(\(" end="\)\)"
+color brightblue start="#`\[\[" end="\]\]"
+color brightblue start="#`\{\{" end="\}\}"
+color brightblue start="#`<<" end=">>"
+color brightblue start="#`｢" end="｣"
+color brightblue start="#`「" end="」"
 
 # Pod Declarator blocks - multi line
 color brightblue start="#[|=]\(" end="\)"
 color brightblue start="#[|=]\[" end="\]"
+color brightblue start="#[|=]\{" end="\}"
 
 # Heredocs
-color brightgreen start="qq?:to\/END\/;" end="^END"
+color green start="\<(q|qq|Q)(:[a-z]+)*:?(to|heredoc)(:[a-z]+)*/[A-Z][A-Z0-9_]*/" end="^[[:space:]]*[A-Z][A-Z0-9_]*[[:space:]]*$"
 
-# Pod
-color brightblue start="^=begin [[:alnum:]]*" end="^=end [[:alnum:]]*"
+# Pod - paragraph and abbreviated blocks, which end at the first blank line
+color brightblue start="^[[:space:]]*=(for|head[0-9]*|item[0-9]*|para|code|input|output|defn|comment|table|nested|config|alias|[A-Z]+)\>" end="^[[:space:]]*$"
+
+# Pod - delimited blocks
+color brightblue start="^[[:space:]]*=begin\>" end="^[[:space:]]*=end\>.*"
+color brightblue start="^[[:space:]]*=begin[[:space:]]+(pod|rakudoc)\>" end="^[[:space:]]*=end[[:space:]]+(pod|rakudoc)\>"
+
+# Pod - everything after =finish
+color brightblue start="^=finish\>" end="x^"
