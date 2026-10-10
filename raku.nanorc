@@ -154,7 +154,7 @@ color yellow ":[0-9]+<[[:alnum:]_.]+>"
 # Strings. Both kinds are matched by one rule, so that an apostrophe inside
 # a double quoted string does not start a single quoted one, and vice versa.
 color green ""([^"\\]|\\.)*"|'([^'\\]|\\.)*'"
-color green "“[^”]*”"
+color green "“[^”]*”|„[^“”]*[“”]"
 
 # Quoting constructs
 color green "\<(q|qq|Q)(w|ww|x)?(:[a-z]+)*(\{\{([^}]|\}[^}])*\}\}|\[\[([^]]|\][^]])*\]\]|<<([^>]|>[^>])*>>|\{[^}]*\}|\[[^]]*\]|<[^>]*>|/[^/]*/|\|[^|]*\||![^!]*!)"
