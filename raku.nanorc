@@ -211,7 +211,7 @@ color green start="\<(q|qq|Q)(:!?[a-z]+)*:(to|heredoc)(:!?[a-z]+)*/HERE/([^'"]|$
 color green start="\<(q|qq|Q)(:!?[a-z]+)*:(to|heredoc)(:!?[a-z]+)*/[A-Z][A-Z0-9_]*/([^'"]|$)" end="^[[:space:]#]*[A-Z][A-Z0-9_]*([[:space:]]*$|[]})'"])|\\n[[:space:]]*[A-Z][A-Z0-9_]*\>"
 # What follows the opener on its line is code, not a part of the heredoc.
 # A string or a comment there keeps the colour it has, which is the same.
-color normal "\<(q|qq|Q)(:!?[a-z]+)*:(to|heredoc)(:!?[a-z]+)*/[A-Z][A-Z0-9_]*/[^'\"#]*"
+color normal "\<(q|qq|Q)(:!?[a-z]+)*:(to|heredoc)(:!?[a-z]+)*/[A-Z][A-Z0-9_]*/[^'"#]*"
 color green "\<(q|qq|Q)(:!?[a-z]+)*:(to|heredoc)(:!?[a-z]+)*/[A-Z][A-Z0-9_]*/"
 
 # Pod - paragraph and abbreviated blocks, which end at the first blank line
